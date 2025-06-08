@@ -24,19 +24,3 @@ async def get_weather(city: str):
     except Exception as e:
         return f"Data n ot fetch: {e}"
     
-@function_tool
-async def search_web(query: str):
-    try:
-        url = "https://api.duckduckgo.com/?q={query}&format=json&no_redirect=1"
-        response = requests.get(url)
-        data = response.json()
-        result = []
-        for item in data.get("RelatedTopics", [][:3]):
-            if "Text" in item and "FirstURL" in item:
-                result.append(f"{item['text']}\n🔗 {item["FirstURL"]}")
-                
-                
-        return "\n\n".join(result) if result else "No relevant results found."
-
-    except Exception as e:
-        return f"Search error: {e}"

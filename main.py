@@ -1,7 +1,7 @@
 import chainlit as cl
 from agents import Runner
 from openai.types.responses import ResponseTextDeltaEvent
-from agent_setup import agent
+from agent_setup import agent, weather_agent
 from agents import RunConfig
 
 config = RunConfig(tracing_disabled=True)
@@ -23,11 +23,21 @@ async def on_message(message: cl.Message):
 
     conversation_text = "\n".join(f"{m['role'].capitalize()}: {m['content']}" for m in history)
 
-    result = Runner.run_streamed(
-        starting_agent=agent,
-        input=conversation_text,
-        run_config=config
-    )
+    msg_lower = message.content.lower()
+    need_tools = any(word in msg_lower for word in ["weather", "forecast", "temperature", "mosam"])
+
+    if need_tools:
+        result = Runner.run_streamed(
+            starting_agent=weather_agent,
+            input=conversation_text,
+            run_config=config
+        )
+    else:
+        result = Runner.run_streamed(
+            starting_agent=agent,
+            input=conversation_text,
+            run_config=config
+        )
 
     async for event in result.stream_events():
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):

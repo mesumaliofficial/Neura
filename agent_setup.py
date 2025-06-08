@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel
-from tools import get_weather, search_web
+from tools import get_weather
 
 load_dotenv()
 
@@ -19,10 +19,13 @@ model = OpenAIChatCompletionsModel(
 
 agent = Agent(
     name="Jarvis",
-    instructions=(
-        "You are a Customer-Facing Agent. "
-        "If the user asks about weather, extract the city name and call the get_weather tool with it."
-    ),
+    instructions="You are a helpful assistant",
     model=model,
-    tools=[get_weather, search_web]
+)
+
+weather_agent = Agent(
+    name="Jarvis",
+    instructions="You are a helpful assistant",
+    model=model,
+    tools=[get_weather]
 )
